@@ -126,7 +126,78 @@ app.delete('/tasklists/:tasklistId', (req, res)=>{
      });
 });
 
+/** CRUD for task , a task should always belong to a tasklist */
+//Get all task for 1 TaskList, http://localhost:3000/tasklists/:tasklistId/tasks/:taskId
+app.get('/tasklists/:tasklistId/tasks', (req, res)=>{
+    Task.find({_taskListId:req.params.tasklistId})
+    .then((tasklist) =>{
+        res.status(200);
+        res.send(tasklist);
+     })
+     .catch((error) => {
+        res.status(500);
+        console.log(error)
+     });
+});
 
+//create  a task inside particular task list
+
+app.post('/tasklists/:tasklistId/tasks', (req, res)=>{
+    console.log(req.body)
+    let taskObj = {'title':req.body.title, '_taskListId':req.params.tasklistId}
+
+    Task(taskObj).save()
+        .then((task)=>{
+            res.status(201);
+            res.send(task);
+        })
+        .catch((error)=>{
+            res.status(500);
+            console.log(error)
+        });
+});
+
+//Get 1 task inside tasklist
+app.get('/tasklists/:tasklistId/tasks/:taskId', (req, res)=>{
+    Task.find({_taskListId:req.params.tasklistId, _id:req.params.taskId})
+    .then((task) =>{
+        res.status(200);
+        res.send(task);
+     })
+     .catch((error) => {
+        res.status(500);
+        console.log(error)
+     });
+});
+
+app.patch('/tasklists/:tasklistId/tasks/:taskId', (req, res)=>{
+    console.log(req.body);
+    let tasklistId = req.params.tasklistId;
+    let taskId = req.params.taskId;
+    Task.findOneAndUpdate({_taskListId:tasklistId, _id: taskId }, {$set: req.body})
+     .then((task) =>{
+        res.status(200);
+        res.send(task);
+     })
+     .catch((error) => {
+        res.status(500);
+        console.log(error)
+     });
+});
+
+app.delete('/tasklists/:tasklistId/tasks/:taskId', (req, res)=>{
+    let tasklistId = req.params.tasklistId;
+    let taskId = req.params.taskId;
+    Task.findOneAndDelete({_taskListId:tasklistId, _id: taskId })
+     .then((task) =>{
+        res.status(200);
+        res.send(task);
+     })
+     .catch((error) => {
+        res.status(500);
+        console.log(error)
+     });
+});
 /* app.listen(3000, function(){
     console.log("server started with port 3000");
 }); */
@@ -138,4 +209,6 @@ app.listen(3000, () => {
     console.log("server started with port 3000");
 });
 
-/** */
+
+
+
